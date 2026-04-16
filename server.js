@@ -13,7 +13,7 @@ const path    = require('path');
 const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, {
-  cors: { origin: '*' },
+  cors: { origin: "*", methods: ["GET", "POST"] },
   transports: ['websocket', 'polling'],
 });
 app.use(express.static(path.join(__dirname, 'public')));
@@ -55,12 +55,6 @@ const rooms = {};
 function genCode() {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 4 }, () => c[Math.floor(Math.random() * c.length)]).join('');
-}
-function getIP() {
-  for (const ifaces of Object.values(os.networkInterfaces()))
-    for (const i of ifaces)
-      if (i.family === 'IPv4' && !i.internal) return i.address;
-  return 'localhost';
 }
 function randColor(used) {
   const avail = COLOR_POOL.filter(c => !used.includes(c));
@@ -169,9 +163,7 @@ io.on('connection', socket => {
     socket.role = 'host';
     console.log(`[房間] ${code}`);
 
-    const PORT = server.address().port;
-    const ip   = getIP();
-    const url  = `http://${ip}:${PORT}/client.html?room=${code}`;
+    const url  = `https://awei-lab.web.app/kinecube/client.html?room=${code}`;
     try {
       const qr = await QRCode.toDataURL(url, {
         width: 300, margin: 2,
@@ -297,11 +289,9 @@ io.on('connection', socket => {
 // ============================================================
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  const ip = getIP();
   console.log(`\n🚀 KineCube Racing v4`);
-  console.log(`   教師端: http://${ip}:${PORT}/host.html`);
-  console.log(`   學生端: http://${ip}:${PORT}/client.html`);
-  console.log(`   本機:   http://localhost:${PORT}/host.html`);
+  console.log(`   伺服器已啟動於 PORT: ${PORT}`);
+  console.log(`   學生端網址: https://awei-lab.web.app/kinecube/client.html`);
   console.log(`\n   ★ 物理常數`);
   console.log(`   賽道 ${PHYSICS.TRACK_LEN}m | 安全區 ${PHYSICS.SAFE_START}~${PHYSICS.WALL_X}m (寬${PHYSICS.WALL_X-PHYSICS.SAFE_START}m)`);
   console.log(`   煞車力 F = ${PHYSICS.BRAKE_F}N | v_safe = √(4500/m)\n`);
