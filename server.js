@@ -167,7 +167,7 @@ io.on('connection', socket => {
     try {
       const qr = await QRCode.toDataURL(url, {
         width: 300, margin: 2,
-        color: { dark: '#00f5ff', light: '#0d0d14' },
+        color: { dark: '#657954', light: '#00000000' },
       });
       socket.emit('host:created', { roomCode: code, clientUrl: url, qrCode: qr,
         physics: PHYSICS   // 將物理常數傳給教師端顯示用
